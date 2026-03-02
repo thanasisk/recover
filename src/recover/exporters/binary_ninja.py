@@ -402,9 +402,11 @@ class BinjaExporter(Exporter):
                     sclass = SegmentClass.DATA
             else:
                 # Fall back to segment flags (mirrors IDA perm logic)
-                executable = bool(seg.flags & SegmentFlag.SegmentExecutable)
-                writable   = bool(seg.flags & SegmentFlag.SegmentWritable)
-
+                #executable = bool(seg.flags & SegmentFlag.SegmentExecutable)
+                #writable   = bool(seg.flags & SegmentFlag.SegmentWritable)
+                executable = seg.executable
+                readable   = seg.readable
+                writable   = seg.writable
                 if executable and writable:
                     sclass = SegmentClass.CODE | SegmentClass.DATA
                 elif executable:
@@ -417,11 +419,14 @@ class BinjaExporter(Exporter):
 
             # perm: reconstruct an IDA-style permission byte for compatibility
             perm = 0
-            if seg.flags & SegmentFlag.SegmentReadable:
+            if seg.readable:
+            #if seg.flags & SegmentFlag.SegmentReadable:
                 perm |= 0x4  # SEGPERM_READ
-            if seg.flags & SegmentFlag.SegmentWritable:
+            if seg.writable:
+            #if seg.flags & SegmentFlag.SegmentWritable:
                 perm |= 0x2  # SEGPERM_WRITE
-            if seg.flags & SegmentFlag.SegmentExecutable:
+            if seg.executable:
+            #if seg.flags & SegmentFlag.SegmentExecutable:
                 perm |= 0x1  # SEGPERM_EXEC
 
             segs.append(
@@ -447,4 +452,4 @@ if __name__ == "__main__":
     print(sys.prefix)
     print(sys.base_prefix)
     exporter = BinjaExporter(bv)
-    recover.export(exporter, "/tmp")
+    recover.export(exporter, "/home/txl/test_data/")
