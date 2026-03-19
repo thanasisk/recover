@@ -2,6 +2,7 @@
 """Binary Ninja exporter."""
 import sys
 import os
+import mmap
 # sys.path manipulation
 current_dir = os.path.dirname(os.path.realpath(__file__))
 plugin_dir = os.path.abspath(os.path.join(current_dir, "..",".."))
@@ -30,6 +31,8 @@ except ImportError:
     print("Unable to import binaryninja API - Exiting")
     sys.exit(-1)
 
+#if bv not in globals():
+#    raise RuntimeError("bv is not injected")
 
 __author__ = "Chariton Karamitas <huku@census-labs.com>"
 __credits__ = ["Chariton Karamitas <huku@census-labs.com>", "Athanasios Kostopoulos <athanasios@akostopoulos.com>"]
@@ -401,12 +404,9 @@ class BinjaExporter(Exporter):
                 elif sem == SectionSemantics.ExternalSectionSemantics:
                     sclass = SegmentClass.DATA
             else:
-                # Fall back to segment flags (mirrors IDA perm logic)
-                #executable = bool(seg.flags & SegmentFlag.SegmentExecutable)
-                #writable   = bool(seg.flags & SegmentFlag.SegmentWritable)
                 executable = seg.executable
-                readable   = seg.readable
-                writable   = seg.writable
+                readable = seg.readable
+                writable = seg.writable
                 if executable and writable:
                     sclass = SegmentClass.CODE | SegmentClass.DATA
                 elif executable:
@@ -453,3 +453,4 @@ if __name__ == "__main__":
     print(sys.base_prefix)
     exporter = BinjaExporter(bv)
     recover.export(exporter, "/home/txl/test_data/")
+    print("Binja exporter completed succesfully")
